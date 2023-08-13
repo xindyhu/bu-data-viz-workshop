@@ -29,10 +29,16 @@ shinyServer(function(input, output, session) {
              state %in% selected_values$state)
   })
   
-  # filter map shapefile based on inputs
+  # filter county map shapefile based on inputs
   shp_geo <- reactive({
     req(selected_values$state)
-    filter(counties_shp, state_name %in% selected_values$state)
+    filter(county_shp, state %in% selected_values$state)
+  })
+  
+  # filter state map shapefile based on inputs
+  state_shp_geo <- reactive({
+    req(selected_values$state)
+    filter(state_shp, state %in% selected_values$state)
   })
   
   ############### generate visualizations ###########################
@@ -50,7 +56,9 @@ shinyServer(function(input, output, session) {
     
     # join county shapefile to heatwave data
     data_for_map <- shp_geo() %>%
-      left_join(heatwave_data_filtered(), by = "fips") 
+      left_join(heatwave_data_filtered(), by = c("fips", "state")) %>%
+      # impute NA as 0
+      replace_na(list(n_epis = 0, dur_epis = 0))
     
     data_for_map %>%
       {if(input$state=="U.S.")
@@ -64,31 +72,47 @@ shinyServer(function(input, output, session) {
         lat2 = max(coords[,2])
       ) %>% 
       addPolygons(
+        data = data_for_map,
         weight = 0.5, 
         color = "#444444", 
         opacity = 1,
         fillOpacity = 1,
         layerId = ~fips, 
-        #fillColor = ~map_pal(n_epis_bin), 
+        fillColor = ~map_pal(n_epis_bin), 
         smoothFactor = 0.5,
+        # tooltip
+        label = ~map_label_format(data_for_map[["county"]], 
+                                  data_for_map[["n_epis"]], 
+                                  data_for_map[["dur_epis"]]),
+        labelOptions = labelOptions(
+          style = list(
+            "font-weight" = "normal",
+            padding = "3px 8px",
+            "font-size" = "12px",
+            "font-family" = "Arial"
+          ),
+          direction = "auto"
+        ),
         # highlight shapes
         highlightOptions = highlightOptions(color = "black", weight = 2,
-                                            bringToFront = TRUE)
-      ) #%>%
-      # addPolylines(
-      #   data = state_shp_geo(), 
-      #   layerId = ~state_fips,
-      #   color = "#444444", 
-      #   opacity = 1, 
-      #   weight = if_else(input$state != "U.S.", 3.5, 1.3)
-      # ) %>%
-      # addLegend(
-      #   position = "bottomleft", 
-      #   title = "Number of heatwaves",
-      #   #pal = map_pal, 
-      #   opacity = 1, 
-      #   values = ~n_epis_bin
-      # )
+                                            bringToFront = TRUE)) %>%
+      # add thicker outline for states
+      addPolylines(
+        data = state_shp_geo(),
+        layerId = ~state_fips,
+        color = "#444444",
+        opacity = 1,
+        weight = if_else(input$state != "U.S.", 3.5, 1.3)
+      ) %>%
+      # add legend
+      addLegend(
+        position = "bottomleft",
+        title = "Number of heatwaves",
+        pal = map_pal,
+        opacity = 1,
+        values = ~n_epis_bin,
+        na.label = 'No heatwave'
+      )
   })
   
   output$map_ui <- renderUI({
