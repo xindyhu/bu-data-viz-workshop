@@ -21,5 +21,12 @@ Code repository for the data visualization workshop at BU SPH, August 2023
 - [`www`](www)
   - Utility: contains a CSS file, which describes how HTML elements should be displayed
 - [`data`](data)
-  - Utility: contains data files needed for the visualization
+  - [`county_shp.RDS`](data/county_shp.RDS)
+    - Utility: contains county shapefile for 50 states + DC
+  - [`state_shp.RDS`](data/state_shp.RDS)
+    - Utility: contains state shapefile for 50 states + DC
+  - [`county_year.RDS`](data/county_year.RDS)
+    - Utility: contains county-year level data of heatwaves
+  - [`df_fips.RDS`](data/df_fips.RDS)
+    - Utility: contains list of FIPS code, county and state names
 
