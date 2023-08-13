@@ -11,11 +11,11 @@ library(here)
 df_fips <- readRDS(here::here("data/df_fips.RDS"))
 # list of 51 states
 states <- c('U.S.', unique(df_fips$state) %>% sort())
-# read in county-year level data
+# read in county-year level heatwave data
 county_year <- readRDS(here::here('data/county_year.RDS'))
-# access county shapefiles
+# read in county shapefiles
 county_shp <- readRDS(here::here('data/county_shp.RDS'))
-# state outline
+# read in state outline
 state_shp <- readRDS(here::here('data/state_shp.RDS'))
 # US National Atlas Equal Area projection
 epsg2163 <- leafletCRS(

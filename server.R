@@ -42,13 +42,14 @@ shinyServer(function(input, output, session) {
   })
   
   ############### generate visualizations ###########################
+  # dynamic title to show the selected state and year
   output$map_tit <- renderUI({
     state_title <- if_else(input$state == "U.S.", "U.S.", input$state)
     txt <- paste0("Heatwaves in ", state_title, ", ", input$year)
     div(class = 'chart-title-container', 
         h4(HTML(txt), class = 'chart-title-text'))
   })
-  
+  # map maps using leaflet
   output$map <- renderLeaflet({
     validate(need(nrow(heatwave_data_filtered()) > 0, "No heatwave data to show."))
     
@@ -62,6 +63,7 @@ shinyServer(function(input, output, session) {
     
     data_for_map %>%
       {if(input$state=="U.S.")
+        # use the US National Atlas Equal Area projection if whole US is selected
         leaflet(., options = leafletOptions(crs = epsg2163))
         else
           leaflet(.)} %>%
@@ -71,6 +73,7 @@ shinyServer(function(input, output, session) {
         lng2 = max(coords[,1]), 
         lat2 = max(coords[,2])
       ) %>% 
+      # fill county polygon with colors
       addPolygons(
         data = data_for_map,
         weight = 0.5, 
@@ -80,7 +83,7 @@ shinyServer(function(input, output, session) {
         layerId = ~fips, 
         fillColor = ~map_pal(n_epis_bin), 
         smoothFactor = 0.5,
-        # tooltip
+        # add tooltip
         label = ~map_label_format(data_for_map[["county"]], 
                                   data_for_map[["n_epis"]], 
                                   data_for_map[["dur_epis"]]),
@@ -90,9 +93,7 @@ shinyServer(function(input, output, session) {
             padding = "3px 8px",
             "font-size" = "12px",
             "font-family" = "Arial"
-          ),
-          direction = "auto"
-        ),
+          ), direction = "auto"),
         # highlight shapes
         highlightOptions = highlightOptions(color = "black", weight = 2,
                                             bringToFront = TRUE)) %>%
@@ -104,21 +105,22 @@ shinyServer(function(input, output, session) {
         opacity = 1,
         weight = if_else(input$state != "U.S.", 3.5, 1.3)
       ) %>%
-      # add legend
+      # add legend to the map
       addLegend(
         position = "bottomleft",
         title = "Number of heatwaves",
         pal = map_pal,
         opacity = 1,
         values = ~n_epis_bin,
+        # label for NA values
         na.label = 'No heatwave'
       )
   })
-  
+  # send map to the map_ui portion in the ui.R
   output$map_ui <- renderUI({
     leafletOutput("map")
   })
-  
+  # if "reset" button is clicked
   observeEvent(input$reset_map, {
     updatePickerInput(inputId = "state", session = session, selected = states)
   })
