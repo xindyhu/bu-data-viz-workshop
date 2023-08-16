@@ -5,12 +5,13 @@ Code repository for the data visualization workshop at BU SPH, August 2023
 # Set up
 
 1. Install R and RStudio from https://posit.co/download/rstudio-desktop/
-2a. If you use Mac, open a terminal, put in `gcc --version` to check if you have gcc installed. If not, follow tutorials [here](https://devicetests.com/fix-gcc-command-not-found-error-ubuntu) to install gcc.
-2b. If you use Windows, make sure you install Rtools corresponding to your R version, follow tutorials [here](https://cran.r-project.org/bin/windows/Rtools/rtools43/rtools.html)
-3. Open bu-datat-viz-workshop.Rproj in RStudio
-4. Install `renv` if you don't already have it
-5. Run `renv::restore()` to load dependencies
-6. Click on the "Run App" button in RStudio when you've opened both the ui.R and server.R files
+2. Check compiler toolchain dependencies
+  a. If you use Mac, open a terminal, put in `gcc --version` to check if you have gcc installed. If not, follow tutorials [here](https://devicetests.com/fix-gcc-command-not-found-error-ubuntu) to install gcc.
+  b. If you use Windows, make sure you install Rtools corresponding to your R version, follow tutorials [here](https://cran.r-project.org/bin/windows/Rtools/rtools43/rtools.html)
+4. Open bu-datat-viz-workshop.Rproj in RStudio
+5. Install `renv` if you don't already have it
+6. Run `renv::restore()` to load dependencies
+7. Click on the "Run App" button in RStudio when you've opened both the ui.R and server.R files
 
 # Files in this folder
 
